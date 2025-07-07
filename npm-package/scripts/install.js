@@ -35,6 +35,22 @@ async function downloadBinary() {
 
   console.log(`Downloading dotenvcrab v${version} for ${platform}...`);
 
+  const localBinaryPath = path.join(
+    __dirname,
+    "..",
+    "..",
+    "target",
+    "release",
+    "dotenvcrab"
+  );
+  if (fs.existsSync(localBinaryPath)) {
+    console.log(
+      `Found local binary at ${localBinaryPath}, using it instead of downloading`
+    );
+    fs.copyFileSync(localBinaryPath, binPath);
+    return;
+  }
+
   // Create bin directory if it doesn't exist
   const binDir = path.dirname(binPath);
   if (!fs.existsSync(binDir)) {
