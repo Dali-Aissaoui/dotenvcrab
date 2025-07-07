@@ -122,10 +122,18 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-      - name: Update package version
+      - name: Extract version from Cargo.toml
+        id: cargo_version
+        run: |
+          VERSION=$(grep '^version =' Cargo.toml | head -1 | cut -d '"' -f 2)
+          echo "CARGO_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Cargo version: $VERSION"
+          
+      - name: Update npm package version
         run: |
           cd npm-package
-          npm version ${{ env.VERSION }} --no-git-tag-version
+          npm version ${{ env.CARGO_VERSION }} --no-git-tag-version
+          echo "Updated npm package.json to version ${{ env.CARGO_VERSION }}"
 
       - name: Publish to NPM
         run: |
