@@ -1,0 +1,32 @@
+[package]
+name = "dotenvcrab"
+version = "0.1.0"
+edition = "2021"
+description = "A blazing fast, portable CLI tool that validates .env files against JSON schema definitions with type checking, strict mode validation, and colorized error output"
+authors = ["dotenvcrab"]
+license = "MIT"
+repository = "https://github.com/dotenvcrab/dotenvcrab"
+readme = "README.md"
+keywords = ["dotenv", "env", "validation", "cli"]
+categories = ["command-line-utilities", "development-tools"]
+
+# Both binary and library
+[[bin]]
+name = "dotenvcrab"
+path = "src/main.rs"
+
+[lib]
+name = "dotenvcrab"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { version = "4.4.18", features = ["derive"] }
+dotenvy = "0.15.7"
+serde = { version = "1.0.177", features = ["derive"] }
+serde_json = "1.0.107"
+thiserror = "1.0.56"
+colored = "3.0.0"
+
+[dev-dependencies]
+tempfile = "3.10.1"
+serde_test = "1.0.177"
