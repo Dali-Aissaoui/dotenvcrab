@@ -5,6 +5,10 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build-rust:
     name: Build Rust Binary (${{ matrix.os }})
@@ -72,6 +76,8 @@ jobs:
     name: Create GitHub Release
     needs: build-rust
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -100,6 +106,9 @@ jobs:
     name: Publish NPM Package
     needs: create-release
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
