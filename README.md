@@ -418,6 +418,26 @@ Contributions are welcome! See [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 Contributions are welcome! Please see [CONTRIBUTING.md](../CONTRIBUTING.md) for details.
 
+## Roadmap & Planned Features
+
+We’re committed to making dotenvcrab the most robust and developer-friendly env validation tool available. Planned and proposed features include:
+
+- **Pattern (regex) validation** for strings
+- **Min/max length and value constraints** for strings and numbers
+- **Format validation** (email, URL, date, etc.)
+- **Conditional required fields** (e.g., `requiredIf`)
+- **Secret/masked field support** (for sensitive values)
+- **Deprecated field warnings**
+- **Schema reuse and references** (import shared schema fragments)
+- **Conditional logic** (`if/then/else` validation)
+- **Custom error messages** per field
+- **Better error reporting** (grouping, suggestions, multi-format)
+- **Auto-generate .env templates** from schema
+- **Schema linting** (warn about unused/misspelled properties)
+- **IDE/editor integration** (e.g., VSCode extension)
+
+**Have an idea or want to contribute?** Open an issue or PR—your feedback shapes the future of dotenvcrab!
+
 ## License
 
 dotenvcrab is distributed under the MIT License. See [LICENSE](../LICENSE) for more information.
