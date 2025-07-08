@@ -13,8 +13,6 @@ chmod +x dotenvcrab
 ./dotenvcrab --help
 ```
 
-Or use the [universal install script](#installation).
-
 ---
 
 ## Features
@@ -177,17 +175,6 @@ Invoke-WebRequest -Uri "https://github.com/Dali-Aissaoui/dotenvcrab/releases/lat
 ./dotenvcrab.exe --help
 ```
 
-## Features
-
-- **Type validation**: string, number, boolean, enum
-- **Required field checking**
-- **Default values** for optional fields
-- **Strict mode** to catch extra/typo keys
-- **Colorized, human-friendly output**
-- **JSON output** for CI/CD
-- **Cross-platform**: macOS, Linux, Windows
-- **No dependencies**: just a single binary
-
 ## Usage
 
 ### Minimal Example
@@ -220,69 +207,6 @@ API_URL=https://api.example.com
 
 ```
 ✅ All environment variables are valid!
-```
-
-**3. `.env` (invalid)**
-
-```
-PORT=not_a_number
-# DEBUG is missing (will use default)
-# API_URL is missing
-```
-
-**Output:**
-
-```
-- PORT: expected number, got string
-- API_URL: missing
-```
-
-### More Examples
-
-**Enum and Pattern Validation**
-
-`env.schema.json`:
-
-```json
-{
-  "ENV": {
-    "type": "string",
-    "enum": ["development", "production", "test"],
-    "required": true
-  },
-  "EMAIL": {
-    "type": "string",
-    "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
-    "required": true
-  }
-}
-```
-
-`.env`:
-
-```
-ENV=production
-EMAIL=admin@example.com
-```
-
-**Output:**
-
-```
-✅ All environment variables are valid!
-```
-
-`.env` (invalid):
-
-```
-ENV=prod
-EMAIL=not-an-email
-```
-
-**Output:**
-
-```
-- ENV: expected one of [development, production, test], got prod
-- EMAIL: does not match pattern ^[^@\s]+@[^@\s]+\.[^@\s]+$
 ```
 
 ### Command Line Options
@@ -440,8 +364,6 @@ For enum fields, specify the allowed values:
 ```
 
 ## CI/CD Integration
-
-[![CI](https://github.com/Dali-Aissaoui/dotenvcrab/actions/workflows/release.yml/badge.svg)](https://github.com/Dali-Aissaoui/dotenvcrab/actions)
 
 ### GitHub Actions: Single Environment
 
