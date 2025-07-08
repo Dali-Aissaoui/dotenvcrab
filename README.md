@@ -423,18 +423,84 @@ Contributions are welcome! Please see [CONTRIBUTING.md](../CONTRIBUTING.md) for 
 We’re committed to making dotenvcrab the most robust and developer-friendly env validation tool available. Planned and proposed features include:
 
 - **Pattern (regex) validation** for strings
+  ```json
+  {
+    "EMAIL": { "type": "string", "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" }
+  }
+  // EMAIL must be a valid email address
+  ```
 - **Min/max length and value constraints** for strings and numbers
+  ```json
+  {
+    "USERNAME": { "type": "string", "minLength": 3, "maxLength": 16 },
+    "PORT": { "type": "number", "min": 1024, "max": 65535 }
+  }
+  // USERNAME must be 3-16 chars; PORT must be in valid range
+  ```
 - **Format validation** (email, URL, date, etc.)
+  ```json
+  {
+    "URL": { "type": "string", "format": "uri" },
+    "START_DATE": { "type": "string", "format": "date" }
+  }
+  // URL must be a valid URI; START_DATE must be a date
+  ```
 - **Conditional required fields** (e.g., `requiredIf`)
+  ```json
+  {
+    "SSL_CERT": { "type": "string", "requiredIf": "SSL_ENABLED" }
+  }
+  // SSL_CERT required if SSL_ENABLED is set
+  ```
 - **Secret/masked field support** (for sensitive values)
+  ```json
+  {
+    "API_KEY": { "type": "string", "secret": true }
+  }
+  // API_KEY will be masked in logs/output
+  ```
 - **Deprecated field warnings**
+  ```json
+  {
+    "OLD_VAR": { "type": "string", "deprecated": true }
+  }
+  // Warn if OLD_VAR is present
+  ```
 - **Schema reuse and references** (import shared schema fragments)
+  ```json
+  {
+    "$ref": "./shared.schema.json#/DATABASE"
+  }
+  // Reuse DATABASE definition from shared schema
+  ```
 - **Conditional logic** (`if/then/else` validation)
+  ```json
+  {
+    "if": { "ENV": "production" },
+    "then": { "SENTRY_DSN": { "type": "string", "required": true } },
+    "else": { "SENTRY_DSN": { "required": false } }
+  }
+  // SENTRY_DSN required only in production
+  ```
 - **Custom error messages** per field
+  ```json
+  {
+    "PORT": {
+      "type": "number",
+      "min": 1024,
+      "max": 65535,
+      "errorMessage": "PORT must be a number between 1024 and 65535."
+    }
+  }
+  ```
 - **Better error reporting** (grouping, suggestions, multi-format)
+  > Example: Output errors grouped by type, with suggestions and optional YAML/JSON output.
 - **Auto-generate .env templates** from schema
+  > Example: `dotenvcrab schema-to-env` generates a `.env.example` file based on schema.
 - **Schema linting** (warn about unused/misspelled properties)
+  > Example: Warn if schema contains properties not used in `.env` or vice versa.
 - **IDE/editor integration** (e.g., VSCode extension)
+  > Example: Real-time validation and autocomplete for `.env` files in your editor.
 
 **Have an idea or want to contribute?** Open an issue or PR—your feedback shapes the future of dotenvcrab!
 
