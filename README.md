@@ -5,6 +5,7 @@ A blazing fast, portable CLI tool to validate your `.env` files against a JSON s
 ---
 
 ## Features
+
 - **Type validation**: string, number, boolean, enum
 - **Required field checking**
 - **Default values** for optional fields
@@ -19,6 +20,7 @@ A blazing fast, portable CLI tool to validate your `.env` files against a JSON s
 ## Why dotenvcrab?
 
 **dotenvcrab** is designed for modern teams who want:
+
 - **Maximum speed** (Rust-native, 10-100x faster than Node.js alternatives)
 - **Zero dependencies** (no Node.js, npm, or Python required—just a single binary)
 - **True type safety** (validate numbers, booleans, enums, not just presence)
@@ -29,22 +31,22 @@ A blazing fast, portable CLI tool to validate your `.env` files against a JSON s
 
 ### Comparison: dotenvcrab vs. dotenv-safe
 
-| Feature                       | **dotenvcrab** (this project)               | [dotenv-safe](https://www.npmjs.com/package/dotenv-safe) |
-|-------------------------------|---------------------------------------------|----------------------------------------------------------|
-| **Language**                  | Rust (native binary)                        | JavaScript (npm package)                                 |
-| **Performance**               | Extremely fast (native code)                | Slower (Node.js runtime)                                 |
-| **Cross-platform**            | Yes (Linux, macOS, Windows)                 | Yes (Node.js required)                                   |
-| **Type validation**           | Yes (string, number, boolean, enum)         | No (string presence only)                                |
-| **Schema format**             | JSON schema                                 | `.env.example` file                                      |
-| **Strict mode (no extra keys)**| Yes                                         | No                                                       |
-| **Default values**            | Yes                                         | No                                                       |
-| **Colorized output**          | Yes                                         | No                                                       |
-| **JSON output**               | Yes (for CI/CD integration)                 | No                                                       |
-| **Zero dependencies**         | Yes (single binary, no Node.js needed)      | Requires Node.js, npm                                    |
-| **CI/CD integration**         | Native, simple binary download              | npm install + Node.js                                    |
-| **Usage in any language stack**| Yes (binary, not tied to Node.js)           | Node.js/JavaScript only                                  |
-| **Install/Update**            | Download/curl, always latest                | npm install/update                                       |
-| **Custom error messages**     | Detailed, colorized, machine-readable       | Basic, plain text                                        |
+| Feature                         | **dotenvcrab** (this project)          | [dotenv-safe](https://www.npmjs.com/package/dotenv-safe) |
+| ------------------------------- | -------------------------------------- | -------------------------------------------------------- |
+| **Language**                    | Rust (native binary)                   | JavaScript (npm package)                                 |
+| **Performance**                 | Extremely fast (native code)           | Slower (Node.js runtime)                                 |
+| **Cross-platform**              | Yes (Linux, macOS, Windows)            | Yes (Node.js required)                                   |
+| **Type validation**             | Yes (string, number, boolean, enum)    | No (string presence only)                                |
+| **Schema format**               | JSON schema                            | `.env.example` file                                      |
+| **Strict mode (no extra keys)** | Yes                                    | No                                                       |
+| **Default values**              | Yes                                    | No                                                       |
+| **Colorized output**            | Yes                                    | No                                                       |
+| **JSON output**                 | Yes (for CI/CD integration)            | No                                                       |
+| **Zero dependencies**           | Yes (single binary, no Node.js needed) | Requires Node.js, npm                                    |
+| **CI/CD integration**           | Native, simple binary download         | npm install + Node.js                                    |
+| **Usage in any language stack** | Yes (binary, not tied to Node.js)      | Node.js/JavaScript only                                  |
+| **Install/Update**              | Download/curl, always latest           | npm install/update                                       |
+| **Custom error messages**       | Detailed, colorized, machine-readable  | Basic, plain text                                        |
 
 **Choose dotenvcrab if you want: blazing speed, type safety, strict validation, and a tool that works everywhere with zero setup.**
 
@@ -62,10 +64,10 @@ A blazing fast, portable CLI tool to validate your `.env` files against a JSON s
 
 On a typical developer laptop (M1 MacBook, SSD):
 
-| Tool         | Typical Run Time (validating .env) |
-|--------------|------------------------------------|
-| dotenvcrab   | 2–5 ms                             |
-| dotenv-safe  | 70–150 ms                          |
+| Tool        | Typical Run Time (validating .env) |
+| ----------- | ---------------------------------- |
+| dotenvcrab  | 2–5 ms                             |
+| dotenv-safe | 70–150 ms                          |
 
 Tested with: `time ./dotenvcrab` vs. `time npx dotenv-safe` on a sample project.
 
@@ -132,6 +134,7 @@ dotenvcrab is a blazing fast, Rust-powered CLI tool that validates your `.env` f
 - **Type Validation**: Ensures variables are the correct type (string, number, boolean, enum)
 
 #### Linux (x86_64)
+
 ```sh
 curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux-amd64"
 chmod +x dotenvcrab
@@ -139,6 +142,7 @@ chmod +x dotenvcrab
 ```
 
 #### macOS (Apple Silicon)
+
 ```sh
 curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-macos-arm64"
 chmod +x dotenvcrab
@@ -146,6 +150,7 @@ chmod +x dotenvcrab
 ```
 
 #### macOS (Intel)
+
 ```sh
 curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-macos-amd64"
 chmod +x dotenvcrab
@@ -153,6 +158,7 @@ chmod +x dotenvcrab
 ```
 
 #### Windows (PowerShell)
+
 ```powershell
 Invoke-WebRequest -Uri "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-windows-amd64.exe" -OutFile "dotenvcrab.exe"
 ./dotenvcrab.exe --help
@@ -181,11 +187,13 @@ Invoke-WebRequest -Uri "https://github.com/Dali-Aissaoui/dotenvcrab/releases/lat
    ```
 
 **Example output (success):**
+
 ```
 ✅ All environment variables are valid!
 ```
 
 **Example output (failure):**
+
 ```
 - PORT: expected number, got string
 - DEBUG: missing
@@ -349,6 +357,7 @@ For enum fields, specify the allowed values:
 ## CI/CD Integration
 
 ### GitHub Actions
+
 ```yaml
 jobs:
   validate_env:
@@ -364,6 +373,7 @@ jobs:
 ```
 
 ### GitLab CI
+
 ```yaml
 validate_env:
   stage: test
@@ -376,17 +386,23 @@ validate_env:
 ## Advanced Usage
 
 ### Strict Mode
+
 Detect typos and undocumented variables:
+
 ```sh
 ./dotenvcrab --strict
 ```
 
 ### JSON Output
+
 For CI/CD or programmatic parsing:
+
 ```sh
 ./dotenvcrab --json
 ```
+
 Example:
+
 ```json
 {
   "valid": false,
@@ -398,12 +414,14 @@ Example:
 ```
 
 ### Multiple Environments
+
 ```sh
 ./dotenvcrab --env .env.production --schema env.production.schema.json
 ./dotenvcrab --env .env.test --schema env.test.schema.json
 ```
 
 ## Updating
+
 To update, just re-run the install command. The `/latest/download/` URL always fetches the newest release.
 
 ## Troubleshooting
@@ -414,9 +432,8 @@ To update, just re-run the install command. The `/latest/download/` URL always f
 - **File not executable**: Run `chmod +x dotenvcrab` after download.
 
 ## Contributing
-Contributions are welcome! See [CONTRIBUTING.md](../CONTRIBUTING.md).
 
-Contributions are welcome! Please see [CONTRIBUTING.md](../CONTRIBUTING.md) for details.
+Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## Roadmap & Planned Features
 
