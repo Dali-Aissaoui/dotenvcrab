@@ -65,19 +65,55 @@ dotenvcrab is a blazing fast, Rust-powered CLI tool that validates your `.env` f
 
 ## Installation
 
-### Binary Installation
+### Quick Install (Recommended)
 
-#### macOS (Homebrew)
-
-```bash
-# Coming soon
-brew install dotenvcrab
+#### Linux (x86_64)
+```sh
+curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux-amd64"
+chmod +x dotenvcrab
+./dotenvcrab --help
 ```
 
-#### Linux
+#### macOS (Apple Silicon)
+```sh
+curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-macos-arm64"
+chmod +x dotenvcrab
+./dotenvcrab --help
+```
+
+#### macOS (Intel)
+```sh
+curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-macos-amd64"
+chmod +x dotenvcrab
+./dotenvcrab --help
+```
+
+#### Windows (PowerShell)
+```powershell
+Invoke-WebRequest -Uri "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-windows-amd64.exe" -OutFile "dotenvcrab.exe"
+./dotenvcrab.exe --help
+```
+
+You can also download the appropriate binary from the [GitHub Releases page](https://github.com/Dali-Aissaoui/dotenvcrab/releases).
+
+#### From Source
+
+Requirements:
+
+- Rust 1.70.0 or later
+- Cargo
 
 ```bash
-# Coming soon
+# Clone the repository
+git clone https://github.com/Dali-Aissaoui/dotenvcrab.git
+cd dotenvcrab
+
+# Build the project
+cargo build --release
+
+# The binary will be available at target/release/dotenvcrab
+```
+
 curl -sSL https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux -o /usr/local/bin/dotenvcrab
 chmod +x /usr/local/bin/dotenvcrab
 ```
@@ -121,34 +157,12 @@ npm install --save-dev dotenvcrab
 
 ### Basic Usage
 
-1. Create a schema file (`env.schema.json`):
-
-```json
-{
-  "PORT": { "type": "number", "required": true },
-  "DEBUG": { "type": "boolean", "required": true },
-  "API_URL": { "type": "string", "required": true },
-  "LOG_LEVEL": {
-    "type": "enum",
-    "values": ["debug", "info", "warn", "error"],
-    "default": "info"
-  }
-}
-```
-
-2. Create your `.env` file:
-
-```
-PORT=3000
-DEBUG=true
-API_URL=https://api.example.com
-LOG_LEVEL=debug
-```
-
-3. Run dotenvcrab:
+1. Create your `env.schema.json` file (see below for schema format).
+2. Create your `.env` file.
+3. Run the binary (see installation above):
 
 ```bash
-dotenvcrab
+./dotenvcrab
 ```
 
 If validation passes, you'll see:
@@ -329,76 +343,24 @@ For enum fields, specify the allowed values:
 
 ## Integration
 
-### npm Scripts
-
-Add dotenvcrab to your `package.json` scripts:
-
-```json
-{
-  "scripts": {
-    "validate-env": "dotenvcrab",
-    "prestart": "dotenvcrab",
-    "prebuild": "dotenvcrab --env .env.production --schema env.production.schema.json",
-    "pretest": "dotenvcrab --env .env.test --schema env.test.schema.json"
-  }
-}
-```
-
-Run it manually:
-
-```bash
-npm run validate-env
-```
-
-Or let it run automatically before other scripts:
-
-```bash
-npm start  # Will run dotenvcrab first
-```
-
-### Husky Pre-commit Hooks
-
-1. Install husky:
-
-```bash
-npm install --save-dev husky
-npx husky install
-```
-
-2. Create a pre-commit hook:
-
-```bash
-npx husky add .husky/pre-commit "npm run validate-env"
-```
-
-This will validate your environment variables before each commit.
-
 ### CI/CD Integration
 
 #### GitHub Actions
 
 ```yaml
-name: Validate Environment
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
 jobs:
-  validate:
+  validate_env:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup dotenvcrab
+      - name: Download dotenvcrab
         run: |
-          curl -sSL https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux -o /usr/local/bin/dotenvcrab
-          chmod +x /usr/local/bin/dotenvcrab
+          curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux-amd64"
+          chmod +x dotenvcrab
 
       - name: Validate .env
-        run: dotenvcrab --json
+        run: ./dotenvcrab --json
 ```
 
 #### GitLab CI
@@ -407,9 +369,9 @@ jobs:
 validate_env:
   stage: test
   script:
-    - curl -sSL https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux -o /usr/local/bin/dotenvcrab
-    - chmod +x /usr/local/bin/dotenvcrab
-    - dotenvcrab --json
+    - curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux-amd64"
+    - chmod +x dotenvcrab
+    - ./dotenvcrab --json
 ```
 
 ## Advanced Usage
