@@ -1,4 +1,20 @@
-# dotenvcrab Documentation
+# dotenvcrab
+
+A blazing fast, portable CLI tool to validate your `.env` files against a JSON schema. Written in Rust for maximum performance and reliability.
+
+---
+
+## Features
+- **Type validation**: string, number, boolean, enum
+- **Required field checking**
+- **Default values** for optional fields
+- **Strict mode** to catch extra/typo keys
+- **Colorized, human-friendly output**
+- **JSON output** for CI/CD
+- **Cross-platform**: macOS, Linux, Windows
+- **No dependencies**: just a single binary
+
+---
 
 ## Table of Contents
 
@@ -57,15 +73,6 @@ These issues are particularly problematic in:
 dotenvcrab is a blazing fast, Rust-powered CLI tool that validates your `.env` files against a JSON schema definition. It provides:
 
 - **Type Validation**: Ensures variables are the correct type (string, number, boolean, enum)
-- **Required Field Checking**: Verifies all required variables are present
-- **Default Values**: Supports default values for optional fields
-- **Schema Documentation**: Self-documenting configuration requirements
-- **Strict Mode**: Optionally fails when extra keys are present
-- **Cross-Platform**: Works on Windows, macOS, and Linux
-
-## Installation
-
-### Quick Install (Recommended)
 
 #### Linux (x86_64)
 ```sh
@@ -94,85 +101,34 @@ Invoke-WebRequest -Uri "https://github.com/Dali-Aissaoui/dotenvcrab/releases/lat
 ./dotenvcrab.exe --help
 ```
 
-You can also download the appropriate binary from the [GitHub Releases page](https://github.com/Dali-Aissaoui/dotenvcrab/releases).
+## Features
 
-#### From Source
-
-Requirements:
-
-- Rust 1.70.0 or later
-- Cargo
-
-```bash
-# Clone the repository
-git clone https://github.com/Dali-Aissaoui/dotenvcrab.git
-cd dotenvcrab
-
-# Build the project
-cargo build --release
-
-# The binary will be available at target/release/dotenvcrab
-```
-
-curl -sSL https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux -o /usr/local/bin/dotenvcrab
-chmod +x /usr/local/bin/dotenvcrab
-```
-
-#### Windows
-
-```bash
-# Coming soon
-# Download from https://github.com/Dali-Aissaoui/dotenvcrab/releases
-```
-
-### From Source
-
-Requirements:
-
-- Rust 1.70.0 or later
-- Cargo
-
-```bash
-# Clone the repository
-git clone https://github.com/Dali-Aissaoui/dotenvcrab.git
-cd dotenvcrab
-
-# Build the project
-cargo build --release
-
-# The binary will be available at target/release/dotenvcrab
-```
-
-### npm Package
-
-```bash
-# Global installation
-npm install -g dotenvcrab
-
-# Project installation
-npm install --save-dev dotenvcrab
-```
+- **Type validation**: string, number, boolean, enum
+- **Required field checking**
+- **Default values** for optional fields
+- **Strict mode** to catch extra/typo keys
+- **Colorized, human-friendly output**
+- **JSON output** for CI/CD
+- **Cross-platform**: macOS, Linux, Windows
+- **No dependencies**: just a single binary
 
 ## Usage
 
 ### Basic Usage
 
-1. Create your `env.schema.json` file (see below for schema format).
+1. Create your `env.schema.json` file (see Schema Format below).
 2. Create your `.env` file.
-3. Run the binary (see installation above):
+3. Run:
+   ```sh
+   ./dotenvcrab
+   ```
 
-```bash
-./dotenvcrab
-```
-
-If validation passes, you'll see:
-
+**Example output (success):**
 ```
 ✅ All environment variables are valid!
 ```
 
-If validation fails, you'll see detailed errors:
-
+**Example output (failure):**
 ```
 - PORT: expected number, got string
 - DEBUG: missing
@@ -193,14 +149,6 @@ OPTIONS:
     -h, --help             Print help information
     -V, --version          Print version information
 ```
-
-### Exit Codes
-
-- `0`: Validation successful
-- `1`: Validation failed (schema violations)
-- `2`: File not found or permission error
-- `3`: Schema parsing error
-- `4`: Other errors
 
 ## Schema Format
 
@@ -341,30 +289,24 @@ For enum fields, specify the allowed values:
 }
 ```
 
-## Integration
+## CI/CD Integration
 
-### CI/CD Integration
-
-#### GitHub Actions
-
+### GitHub Actions
 ```yaml
 jobs:
   validate_env:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
       - name: Download dotenvcrab
         run: |
           curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux-amd64"
           chmod +x dotenvcrab
-
       - name: Validate .env
         run: ./dotenvcrab --json
 ```
 
-#### GitLab CI
-
+### GitLab CI
 ```yaml
 validate_env:
   stage: test
@@ -377,25 +319,17 @@ validate_env:
 ## Advanced Usage
 
 ### Strict Mode
-
-Strict mode fails validation if there are extra keys in the `.env` file that aren't defined in the schema:
-
-```bash
-dotenvcrab --strict
+Detect typos and undocumented variables:
+```sh
+./dotenvcrab --strict
 ```
-
-This is useful for catching typos and ensuring all environment variables are documented.
 
 ### JSON Output
-
-For CI/CD pipelines or programmatic usage, you can get JSON output:
-
-```bash
-dotenvcrab --json
+For CI/CD or programmatic parsing:
+```sh
+./dotenvcrab --json
 ```
-
-Example output:
-
+Example:
 ```json
 {
   "valid": false,
@@ -407,45 +341,23 @@ Example output:
 ```
 
 ### Multiple Environments
-
-For projects with multiple environments, you can specify different `.env` and schema files:
-
-```bash
-# Development
-dotenvcrab --env .env.development --schema env.development.schema.json
-
-# Production
-dotenvcrab --env .env.production --schema env.production.schema.json
-
-# Test
-dotenvcrab --env .env.test --schema env.test.schema.json
+```sh
+./dotenvcrab --env .env.production --schema env.production.schema.json
+./dotenvcrab --env .env.test --schema env.test.schema.json
 ```
 
-## Performance
-
-dotenvcrab is written in Rust for maximum performance. It's designed to be fast enough to run in CI/CD pipelines and pre-commit hooks without adding noticeable delay.
+## Updating
+To update, just re-run the install command. The `/latest/download/` URL always fetches the newest release.
 
 ## Troubleshooting
 
-### Common Issues
-
-#### "Failed to load .env file"
-
-- Check that the `.env` file exists at the specified path
-- Ensure you have read permissions for the file
-
-#### "Failed to load schema"
-
-- Check that the schema file exists at the specified path
-- Ensure the schema is valid JSON
-
-#### "Invalid type for [VARIABLE]"
-
-- Check that the variable value matches the type specified in the schema
-- For numbers, ensure there are no quotes or non-numeric characters
-- For booleans, use one of the supported boolean representations
+- **"Failed to load .env file"**: Ensure the file exists and is readable.
+- **"Failed to load schema"**: Ensure the schema file exists and is valid JSON.
+- **"Invalid type for [VARIABLE]"**: Check your value and schema type.
+- **File not executable**: Run `chmod +x dotenvcrab` after download.
 
 ## Contributing
+Contributions are welcome! See [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 Contributions are welcome! Please see [CONTRIBUTING.md](../CONTRIBUTING.md) for details.
 
