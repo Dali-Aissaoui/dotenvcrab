@@ -40,6 +40,9 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
+      - name: Run tests
+        run: cargo test --all --locked --release --color always
+
       - name: Install cross-compilation tools
         if: contains(matrix.target, 'aarch64') && contains(matrix.os, 'ubuntu')
         run: |
