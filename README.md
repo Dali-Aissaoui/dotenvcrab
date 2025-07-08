@@ -16,6 +16,41 @@ A blazing fast, portable CLI tool to validate your `.env` files against a JSON s
 
 ---
 
+## Why dotenvcrab?
+
+**dotenvcrab** is designed for modern teams who want:
+- **Maximum speed** (Rust-native, 10-100x faster than Node.js alternatives)
+- **Zero dependencies** (no Node.js, npm, or Python required—just a single binary)
+- **True type safety** (validate numbers, booleans, enums, not just presence)
+- **Strict validation** (fail on extra keys, catch typos and misconfigurations early)
+- **First-class CI/CD support** (machine-readable JSON output, no runtime install needed)
+- **Universal compatibility** (works in any stack: Node.js, Python, Go, Java, Docker, etc.)
+- **Effortless updates** (just re-run the install command for the latest version)
+
+### Comparison: dotenvcrab vs. dotenv-safe
+
+| Feature                       | **dotenvcrab** (this project)               | [dotenv-safe](https://www.npmjs.com/package/dotenv-safe) |
+|-------------------------------|---------------------------------------------|----------------------------------------------------------|
+| **Language**                  | Rust (native binary)                        | JavaScript (npm package)                                 |
+| **Performance**               | Extremely fast (native code)                | Slower (Node.js runtime)                                 |
+| **Cross-platform**            | Yes (Linux, macOS, Windows)                 | Yes (Node.js required)                                   |
+| **Type validation**           | Yes (string, number, boolean, enum)         | No (string presence only)                                |
+| **Schema format**             | JSON schema                                 | `.env.example` file                                      |
+| **Strict mode (no extra keys)**| Yes                                         | No                                                       |
+| **Default values**            | Yes                                         | No                                                       |
+| **Colorized output**          | Yes                                         | No                                                       |
+| **JSON output**               | Yes (for CI/CD integration)                 | No                                                       |
+| **Zero dependencies**         | Yes (single binary, no Node.js needed)      | Requires Node.js, npm                                    |
+| **CI/CD integration**         | Native, simple binary download              | npm install + Node.js                                    |
+| **Usage in any language stack**| Yes (binary, not tied to Node.js)           | Node.js/JavaScript only                                  |
+| **Install/Update**            | Download/curl, always latest                | npm install/update                                       |
+| **Custom error messages**     | Detailed, colorized, machine-readable       | Basic, plain text                                        |
+
+**Choose dotenvcrab if you want: blazing speed, type safety, strict validation, and a tool that works everywhere with zero setup.**
+
+---
+
+
 ## Table of Contents
 
 - [Introduction](#introduction)
