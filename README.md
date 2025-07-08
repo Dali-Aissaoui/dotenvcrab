@@ -1,6 +1,19 @@
 # dotenvcrab
 
-A blazing fast, portable CLI tool to validate your `.env` files against a JSON schema. Written in Rust for maximum performance and reliability.
+> **The fastest, type-safe, zero-dependency CLI for validating .env files—any stack, any CI, anywhere.**
+
+---
+
+## 🚀 Quickstart (TL;DR)
+
+```sh
+# Download and run for your platform (Linux x86_64 example)
+curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux-amd64"
+chmod +x dotenvcrab
+./dotenvcrab --help
+```
+
+Or use the [universal install script](#installation).
 
 ---
 
@@ -177,27 +190,99 @@ Invoke-WebRequest -Uri "https://github.com/Dali-Aissaoui/dotenvcrab/releases/lat
 
 ## Usage
 
-### Basic Usage
+### Minimal Example
 
-1. Create your `env.schema.json` file (see Schema Format below).
-2. Create your `.env` file.
-3. Run:
-   ```sh
-   ./dotenvcrab
-   ```
+**1. `env.schema.json`**
 
-**Example output (success):**
+```json
+{
+  "PORT": { "type": "number", "required": true },
+  "DEBUG": { "type": "boolean", "default": false },
+  "API_URL": { "type": "string", "required": true }
+}
+```
+
+**2. `.env` (valid)**
+
+```
+PORT=8080
+DEBUG=true
+API_URL=https://api.example.com
+```
+
+**Run:**
+
+```sh
+./dotenvcrab
+```
+
+**Output:**
 
 ```
 ✅ All environment variables are valid!
 ```
 
-**Example output (failure):**
+**3. `.env` (invalid)**
+
+```
+PORT=not_a_number
+# DEBUG is missing (will use default)
+# API_URL is missing
+```
+
+**Output:**
 
 ```
 - PORT: expected number, got string
-- DEBUG: missing
 - API_URL: missing
+```
+
+### More Examples
+
+**Enum and Pattern Validation**
+
+`env.schema.json`:
+
+```json
+{
+  "ENV": {
+    "type": "string",
+    "enum": ["development", "production", "test"],
+    "required": true
+  },
+  "EMAIL": {
+    "type": "string",
+    "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+    "required": true
+  }
+}
+```
+
+`.env`:
+
+```
+ENV=production
+EMAIL=admin@example.com
+```
+
+**Output:**
+
+```
+✅ All environment variables are valid!
+```
+
+`.env` (invalid):
+
+```
+ENV=prod
+EMAIL=not-an-email
+```
+
+**Output:**
+
+```
+- ENV: expected one of [development, production, test], got prod
+- EMAIL: does not match pattern ^[^@\s]+@[^@\s]+\.[^@\s]+$
 ```
 
 ### Command Line Options
@@ -356,15 +441,59 @@ For enum fields, specify the allowed values:
 
 ## CI/CD Integration
 
-### GitHub Actions
+[![CI](https://github.com/Dali-Aissaoui/dotenvcrab/actions/workflows/release.yml/badge.svg)](https://github.com/Dali-Aissaoui/dotenvcrab/actions)
+
+### GitHub Actions: Single Environment
 
 ```yaml
 jobs:
   validate_env:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Download dotenvcrab
+        run: |
+          curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux-amd64"
+          chmod +x dotenvcrab
+      - name: Validate .env
+        run: ./dotenvcrab --json
+```
+
+### GitHub Actions: Matrix (Multiple Environments)
+
+```yaml
+jobs:
+  validate_env:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        envfile: [".env", ".env.production", ".env.staging"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download dotenvcrab
+        run: |
+          curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux-amd64"
+          chmod +x dotenvcrab
+      - name: Validate ${{ matrix.envfile }}
+        run: ./dotenvcrab --env ${{ matrix.envfile }} --json
+```
+
+### GitHub Actions: Cache the Binary for Faster CI
+
+```yaml
+jobs:
+  validate_env:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache dotenvcrab binary
+        id: cache-dotenvcrab
+        uses: actions/cache@v4
+        with:
+          path: dotenvcrab
+          key: ${{ runner.os }}-dotenvcrab-latest
+      - name: Download dotenvcrab if not cached
+        if: steps.cache-dotenvcrab.outputs.cache-hit != 'true'
         run: |
           curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux-amd64"
           chmod +x dotenvcrab
@@ -382,6 +511,47 @@ validate_env:
     - chmod +x dotenvcrab
     - ./dotenvcrab --json
 ```
+
+## Using dotenvcrab in CI/CD Pipelines
+
+**Why validate your env files in CI/CD?**
+
+- **Catch misconfigurations early:** Fail fast if critical env vars are missing, mistyped, or invalid before deploy.
+- **Prevent production outages:** Ensure only valid, documented config reaches production.
+- **Automate config checks:** Make env validation a required step for every PR, branch, or release.
+
+**Typical CI/CD Pipeline Flow:**
+
+1. Checkout code
+2. Download the correct dotenvcrab binary for your runner
+3. Run validation (on all relevant `.env` files)
+4. Fail the build if validation fails (output is machine- and human-readable)
+5. (Optional) Use JSON output for integration with other tools
+
+### Example: GitHub Actions (with matrix, JSON output, and fail-fast)
+
+```yaml
+jobs:
+  validate_env:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        envfile: [".env", ".env.production", ".env.staging"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download dotenvcrab
+        run: |
+          curl -L -o dotenvcrab "https://github.com/Dali-Aissaoui/dotenvcrab/releases/latest/download/dotenvcrab-linux-amd64"
+          chmod +x dotenvcrab
+      - name: Validate ${{ matrix.envfile }}
+        run: ./dotenvcrab --env ${{ matrix.envfile }} --json
+```
+
+**Best Practices:**
+
+- Run dotenvcrab as early as possible in your pipeline.
+- Use the `--json` flag for machine-readable output (for bots, dashboards, or custom reporting).
+- Make env validation a required check for merging or deploying.
 
 ## Advanced Usage
 
