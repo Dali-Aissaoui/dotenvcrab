@@ -1,6 +1,7 @@
 use dotenvcrab::schema::SchemaField;
-use dotenvcrab::validation::{validate_env, ValidationError, ValidationResult};
+use dotenvcrab::validation::{validate_env, ValidationResult, ValidationError};
 use std::collections::HashMap;
+mod test_helpers;
 
 #[test]
 fn test_validation_result_new() {
@@ -72,7 +73,6 @@ fn test_validate_env_missing_required() {
     
     let mut env_vars = HashMap::new();
     env_vars.insert("PORT".to_string(), "8080".to_string());
-    // DEBUG is missing
     
     let result = validate_env(&env_vars, &schema, false);
     
@@ -110,7 +110,6 @@ fn test_validate_env_with_default_value() {
     
     let mut env_vars = HashMap::new();
     env_vars.insert("PORT".to_string(), "8080".to_string());
-    // LOG_LEVEL is missing but has a default
     
     let result = validate_env(&env_vars, &schema, false);
     
@@ -291,12 +290,10 @@ fn test_validate_env_strict_mode() {
     env_vars.insert("PORT".to_string(), "8080".to_string());
     env_vars.insert("EXTRA_VAR".to_string(), "value".to_string());
     
-    // without strict mode
     let result = validate_env(&env_vars, &schema, false);
     assert!(result.is_valid);
     assert!(result.errors.is_empty());
     
-    // with strict mode
     let result = validate_env(&env_vars, &schema, true);
     assert!(!result.is_valid);
     assert_eq!(result.errors.len(), 1);
@@ -341,7 +338,6 @@ fn test_validate_env_multiple_errors() {
     let mut env_vars = HashMap::new();
     env_vars.insert("PORT".to_string(), "not-a-number".to_string());
     env_vars.insert("ENV".to_string(), "staging".to_string());
-    // DEBUG is missing
     env_vars.insert("EXTRA_VAR".to_string(), "value".to_string());
     
     let result = validate_env(&env_vars, &schema, true);
@@ -349,7 +345,6 @@ fn test_validate_env_multiple_errors() {
     assert!(!result.is_valid);
     assert_eq!(result.errors.len(), 4);
     
-    // check that we have all expected error types
     let mut has_invalid_type = false;
     let mut has_invalid_enum = false;
     let mut has_missing_required = false;

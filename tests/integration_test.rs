@@ -1,19 +1,8 @@
 use std::fs::File;
 use std::io::Write;
-use std::path::Path;
-use std::process::Command;
 use tempfile::tempdir;
-
-// helper function to run the dotenvcrab CLI
-fn run_dotenvcrab(args: &[&str]) -> std::process::Output {
-    Command::new("cargo")
-        .arg("run")
-        .arg("--")
-        .args(args)
-        .current_dir(Path::new(env!("CARGO_MANIFEST_DIR")))
-        .output()
-        .expect("Failed to execute command")
-}
+mod test_helpers;
+use test_helpers::run_dotenvcrab;
 
 #[test]
 fn test_valid_env() {
@@ -35,7 +24,6 @@ fn test_valid_env() {
     )
     .unwrap();
     
-    // create a valid .env file
     let env_path = dir.path().join(".env");
     let mut env_file = File::create(&env_path).unwrap();
     writeln!(env_file, "PORT=8080").unwrap();
@@ -124,6 +112,8 @@ fn test_strict_mode() {
     assert!(!output.status.success());
     
     let stdout = String::from_utf8_lossy(&output.stdout);
+    eprintln!("STRICT MODE OUTPUT: '{}'\n", stdout);
+    
     assert!(stdout.contains("Invalid .env"));
     assert!(stdout.contains("EXTRA"));
     assert!(stdout.contains("not in schema"));

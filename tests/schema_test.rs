@@ -1,27 +1,22 @@
 use dotenvcrab::schema::{load_schema, SchemaField};
 use std::path::Path;
-use tempfile::NamedTempFile;
-use std::io::Write;
+mod test_helpers;
+use test_helpers::{create_temp_file, load_schema_from_str};
 
 #[test]
 fn test_load_schema_success() {
-
-    let mut file = NamedTempFile::new().unwrap();
-    writeln!(
-        file,
-        r#"{{
-            "PORT": {{ "type": "number", "required": true }},
-            "DEBUG": {{ "type": "boolean", "required": true }},
-            "ENV": {{
-                "type": "enum",
-                "required": true,
-                "values": ["dev", "staging", "production"]
-            }}
-        }}"#
-    )
-    .unwrap();
-
-    let schema = load_schema(file.path()).unwrap();
+    // Using test helper to create temp file
+    let schema_json = r#"{
+        "PORT": { "type": "number", "required": true },
+        "DEBUG": { "type": "boolean", "required": true },
+        "ENV": {
+            "type": "enum",
+            "required": true,
+            "values": ["dev", "staging", "production"]
+        }
+    }"#;
+    
+    let schema = load_schema_from_str(schema_json).unwrap();
     
     assert_eq!(schema.len(), 3);
     
@@ -63,10 +58,9 @@ fn test_load_schema_file_not_found() {
 
 #[test]
 fn test_load_schema_invalid_json() {
-    let mut file = NamedTempFile::new().unwrap();
-    writeln!(file, "this is not valid JSON").unwrap();
+    let temp_file = create_temp_file("this is not valid JSON");
     
-    let result = load_schema(file.path());
+    let result = load_schema(temp_file.path());
     assert!(result.is_err());
 }
 
