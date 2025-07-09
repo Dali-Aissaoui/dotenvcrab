@@ -46,6 +46,20 @@ pub fn print_colored_result(result: &ValidationResult) {
                 ValidationError::ExtraField(key) => {
                     println!("- {}: {}", key.yellow(), "not in schema".red());
                 }
+                ValidationError::InvalidPattern(key, pattern) => {
+                    println!(
+                        "- {}: value does not match pattern {}",
+                        key.yellow(),
+                        pattern.green()
+                    );
+                },
+                ValidationError::InvalidRegexPattern(key, error) => {
+                    println!(
+                        "- {}: invalid regex pattern: {}",
+                        key.yellow(),
+                        error.red()
+                    );
+                }
             }
         }
     }

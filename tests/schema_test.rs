@@ -5,7 +5,6 @@ use test_helpers::{create_temp_file, load_schema_from_str};
 
 #[test]
 fn test_load_schema_success() {
-    // Using test helper to create temp file
     let schema_json = r#"{
         "PORT": { "type": "number", "required": true },
         "DEBUG": { "type": "boolean", "required": true },
@@ -70,6 +69,7 @@ fn test_schema_field_is_required() {
         required: true,
         default: None,
         description: None,
+        pattern: None,
     };
     assert!(string_field.is_required());
     
@@ -87,6 +87,7 @@ fn test_schema_field_get_default() {
         required: false,
         default: Some("default".to_string()),
         description: None,
+        pattern: None,
     };
     assert_eq!(string_field.get_default(), Some("default".to_string()));
     
@@ -116,6 +117,7 @@ fn test_schema_field_get_default() {
         required: true,
         default: None,
         description: None,
+        pattern: None,
     };
     assert_eq!(no_default.get_default(), None);
 }

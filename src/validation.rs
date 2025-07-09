@@ -1,6 +1,7 @@
 use crate::schema::{Schema, SchemaField};
 use std::collections::{HashMap, HashSet};
 use thiserror::Error;
+use regex::Regex;
 
 #[derive(Debug, Error)]
 pub enum ValidationError {
@@ -15,6 +16,12 @@ pub enum ValidationError {
     
     #[error("extra field not in schema: {0}")]
     ExtraField(String),
+    
+    #[error("value for {0} does not match pattern: {1}")]
+    InvalidPattern(String, String),
+    
+    #[error("invalid regex pattern for {0}: {1}")]
+    InvalidRegexPattern(String, String),
 }
 
 #[derive(Debug)]
@@ -50,7 +57,25 @@ pub fn validate_env(
         
         if let Some(value) = env_vars.get(key) {
             match field {
-                SchemaField::String { .. } => {
+                SchemaField::String { pattern, .. } => {
+                    if let Some(pattern_str) = pattern {
+                        match Regex::new(pattern_str) {
+                            Ok(regex) => {
+                                if !regex.is_match(value) {
+                                    result.add_error(ValidationError::InvalidPattern(
+                                        key.clone(),
+                                        pattern_str.clone(),
+                                    ));
+                                }
+                            },
+                            Err(err) => {
+                                result.add_error(ValidationError::InvalidRegexPattern(
+                                    key.clone(),
+                                    err.to_string(),
+                                ));
+                            }
+                        }
+                    }
                 }
                 
                 SchemaField::Number { .. } => {

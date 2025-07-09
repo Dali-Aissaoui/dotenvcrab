@@ -25,6 +25,8 @@ pub enum SchemaField {
         default: Option<String>,
         #[serde(default)]
         description: Option<String>,
+        #[serde(default)]
+        pattern: Option<String>,
     },
     
     #[serde(rename = "number")]

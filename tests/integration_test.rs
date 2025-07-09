@@ -85,6 +85,76 @@ fn test_invalid_env() {
 }
 
 #[test]
+fn test_invalid_regex_pattern() {
+    let dir = tempdir().unwrap();
+    let schema_path = dir.path().join("schema.json");
+    let mut schema_file = File::create(&schema_path).unwrap();
+    writeln!(
+        schema_file,
+        r#"{{
+            "EMAIL": {{ "type": "string", "required": true, "pattern": "[a-z++" }}
+        }}"#
+    )
+    .unwrap();
+    
+    let env_path = dir.path().join(".env");
+    let mut env_file = File::create(&env_path).unwrap();
+    writeln!(env_file, "EMAIL=test@example.com").unwrap();
+    
+    let output = run_dotenvcrab(&[
+        "--env", env_path.to_str().unwrap(),
+        "--schema", schema_path.to_str().unwrap(),
+    ]);
+    
+    assert!(!output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("Invalid .env"));
+    assert!(stdout.contains("EMAIL"));
+    assert!(stdout.contains("invalid regex pattern"));
+}
+
+#[test]
+fn test_pattern_validation() {
+    let dir = tempdir().unwrap();
+    let schema_path = dir.path().join("schema.json");
+    let mut schema_file = File::create(&schema_path).unwrap();
+    writeln!(
+        schema_file,
+        r#"{{
+            "EMAIL": {{ "type": "string", "required": true, "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" }}
+        }}"#
+    )
+    .unwrap();
+    
+    let env_path = dir.path().join(".env");
+    let mut env_file = File::create(&env_path).unwrap();
+    writeln!(env_file, "EMAIL=not-an-email").unwrap();
+    
+    let output = run_dotenvcrab(&[
+        "--env", env_path.to_str().unwrap(),
+        "--schema", schema_path.to_str().unwrap(),
+    ]);
+    
+    assert!(!output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("Invalid .env"));
+    assert!(stdout.contains("EMAIL"));
+    assert!(stdout.contains("does not match pattern"));
+    
+    let mut env_file = File::create(&env_path).unwrap();
+    writeln!(env_file, "EMAIL=user@example.com").unwrap();
+    
+    let output = run_dotenvcrab(&[
+        "--env", env_path.to_str().unwrap(),
+        "--schema", schema_path.to_str().unwrap(),
+    ]);
+    
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("All environment variables are valid"));
+}
+
+#[test]
 fn test_strict_mode() {
     let dir = tempdir().unwrap();
     
