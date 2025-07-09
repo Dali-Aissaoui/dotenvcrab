@@ -18,6 +18,7 @@ chmod +x dotenvcrab
 ## Features
 
 - **Type validation**: string, number, boolean, enum
+- **Pattern validation**: regex pattern matching for string fields
 - **Required field checking**
 - **Default values** for optional fields
 - **Strict mode** to catch extra/typo keys
@@ -48,6 +49,7 @@ chmod +x dotenvcrab
 | **Performance**                 | Extremely fast (native code)           | Slower (Node.js runtime)                                 |
 | **Cross-platform**              | Yes (Linux, macOS, Windows)            | Yes (Node.js required)                                   |
 | **Type validation**             | Yes (string, number, boolean, enum)    | No (string presence only)                                |
+| **Pattern validation**          | Yes (regex pattern matching)           | No                                                       |
 | **Schema format**               | JSON schema                            | `.env.example` file                                      |
 | **Strict mode (no extra keys)** | Yes                                    | No                                                       |
 | **Default values**              | Yes                                    | No                                                       |
@@ -243,13 +245,16 @@ The schema is defined in a JSON file with the following structure:
 
 #### String
 
-Accepts any string value.
+Accepts any string value. Can also include pattern validation using regular expressions.
 
 ```json
 {
-  "API_KEY": { "type": "string", "required": true }
+  "API_KEY": { "type": "string", "required": true },
+  "EMAIL": { "type": "string", "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" }
 }
 ```
+
+The `pattern` field accepts a regular expression that the string value must match. If the value doesn't match the pattern, validation will fail with a clear error message.
 
 #### Number
 
@@ -336,25 +341,32 @@ For enum fields, specify the allowed values:
 {
   "PORT": {
     "type": "number",
-    "required": true
+    "required": true,
+    "description": "The port number for the server to listen on"
   },
   "DEBUG": {
     "type": "boolean",
-    "required": true
+    "required": false,
+    "default": false,
+    "description": "Enable debug logging and features"
   },
-  "API_URL": {
+  "API_KEY": {
     "type": "string",
-    "required": true
-  },
-  "NODE_ENV": {
-    "type": "enum",
     "required": true,
-    "values": ["development", "production", "test"]
+    "description": "API key for external service authentication"
+  },
+  "EMAIL": {
+    "type": "string",
+    "required": true,
+    "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+    "description": "Valid email address for notifications"
   },
   "LOG_LEVEL": {
     "type": "enum",
+    "required": false,
+    "default": "info",
     "values": ["debug", "info", "warn", "error"],
-    "default": "info"
+    "description": "Logging level for the application"
   },
   "CACHE_TTL": {
     "type": "number",
@@ -531,13 +543,6 @@ Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for d
 
 We’re committed to making dotenvcrab the most robust and developer-friendly env validation tool available. Planned and proposed features include:
 
-- **Pattern (regex) validation** for strings
-  ```json
-  {
-    "EMAIL": { "type": "string", "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" }
-  }
-  // EMAIL must be a valid email address
-  ```
 - **Min/max length and value constraints** for strings and numbers
   ```json
   {
