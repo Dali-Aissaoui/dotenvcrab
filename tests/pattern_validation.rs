@@ -1,46 +1,30 @@
-use dotenvcrab::validation::{validate_env, ValidationError};
-use dotenvcrab::schema::SchemaField;
-use std::collections::HashMap;
+use dotenvcrab::validation::ValidationError;
 mod test_helpers;
+use test_helpers::validate_env_with_schema;
 
 #[test]
 fn test_pattern_validation_valid() {
-    let mut schema = HashMap::new();
-    schema.insert(
-        "EMAIL".to_string(),
-        SchemaField::String {
-            required: true,
-            default: None,
-            description: None,
-            pattern: Some(r"^[^@\s]+@[^@\s]+\.[^@\s]+$".to_string()),
-        },
-    );
+    let schema_str = r#"{
+        "EMAIL": { "type": "string", "required": true, "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" }
+    }"#;
     
-    let mut env_vars = HashMap::new();
-    env_vars.insert("EMAIL".to_string(), "user@example.com".to_string());
+
+    let env_str = "EMAIL=user@example.com";
     
-    let result = validate_env(&env_vars, &schema, false);
+    let result = validate_env_with_schema(env_str, schema_str, false);
     assert!(result.is_valid);
     assert!(result.errors.is_empty());
 }
 
 #[test]
 fn test_pattern_validation_invalid() {
-    let mut schema = HashMap::new();
-    schema.insert(
-        "EMAIL".to_string(),
-        SchemaField::String {
-            required: true,
-            default: None,
-            description: None,
-            pattern: Some(r"^[^@\s]+@[^@\s]+\.[^@\s]+$".to_string()),
-        },
-    );
+    let schema_str = r#"{
+        "EMAIL": { "type": "string", "required": true, "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" }
+    }"#;
     
-    let mut env_vars = HashMap::new();
-    env_vars.insert("EMAIL".to_string(), "not-an-email".to_string());
+    let env_str = "EMAIL=not-an-email";
     
-    let result = validate_env(&env_vars, &schema, false);
+    let result = validate_env_with_schema(env_str, schema_str, false);
     assert!(!result.is_valid);
     assert_eq!(result.errors.len(), 1);
     
@@ -54,60 +38,14 @@ fn test_pattern_validation_invalid() {
 }
 
 #[test]
-fn test_pattern_validation_multiple_fields() {
-    let mut schema = HashMap::new();
-    schema.insert(
-        "EMAIL".to_string(),
-        SchemaField::String {
-            required: true,
-            default: None,
-            description: None,
-            pattern: Some(r"^[^@\s]+@[^@\s]+\.[^@\s]+$".to_string()),
-        },
-    );
-    schema.insert(
-        "PHONE".to_string(),
-        SchemaField::String {
-            required: true,
-            default: None,
-            description: None,
-            pattern: Some(r"^\d{3}-\d{3}-\d{4}$".to_string()),
-        },
-    );
-    
-    let mut env_vars = HashMap::new();
-    env_vars.insert("EMAIL".to_string(), "user@example.com".to_string());
-    env_vars.insert("PHONE".to_string(), "123-456".to_string());
-    
-    let result = validate_env(&env_vars, &schema, false);
-    assert!(!result.is_valid);
-    assert_eq!(result.errors.len(), 1);
-    
-    match &result.errors[0] {
-        ValidationError::InvalidPattern(key, _) => {
-            assert_eq!(key, "PHONE");
-        }
-        _ => panic!("Expected InvalidPattern error"),
-    }
-}
-
-#[test]
 fn test_invalid_regex_pattern() {
-    let mut schema = HashMap::new();
-    schema.insert(
-        "EMAIL".to_string(),
-        SchemaField::String {
-            required: true,
-            default: None,
-            description: None,
-            pattern: Some(r"[a-z++".to_string()),
-        },
-    );
+    let schema_str = r#"{
+        "EMAIL": { "type": "string", "required": true, "pattern": "[a-z++" }
+    }"#;
     
-    let mut env_vars = HashMap::new();
-    env_vars.insert("EMAIL".to_string(), "test@example.com".to_string());
+    let env_str = "EMAIL=test@example.com";
     
-    let result = validate_env(&env_vars, &schema, false);
+    let result = validate_env_with_schema(env_str, schema_str, false);
     assert!(!result.is_valid);
     assert_eq!(result.errors.len(), 1);
     
@@ -122,31 +60,36 @@ fn test_invalid_regex_pattern() {
 }
 
 #[test]
+fn test_pattern_validation_multiple_fields() {
+    let schema_str = r#"{
+        "EMAIL": { "type": "string", "required": true, "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" },
+        "PHONE": { "type": "string", "required": true, "pattern": "^\\d{3}-\\d{3}-\\d{4}$" }
+    }"#;
+
+    let env_str = "EMAIL=user@example.com\nPHONE=123-456";
+    
+    let result = validate_env_with_schema(env_str, schema_str, false);
+    assert!(!result.is_valid);
+    assert_eq!(result.errors.len(), 1);
+    
+    match &result.errors[0] {
+        ValidationError::InvalidPattern(key, _) => {
+            assert_eq!(key, "PHONE");
+        }
+        _ => panic!("Expected InvalidPattern error"),
+    }
+}
+
+#[test]
 fn test_pattern_validation_with_other_errors() {
-    let mut schema = HashMap::new();
-    schema.insert(
-        "EMAIL".to_string(),
-        SchemaField::String {
-            required: true,
-            default: None,
-            description: None,
-            pattern: Some(r"^[^@\s]+@[^@\s]+\.[^@\s]+$".to_string()),
-        },
-    );
-    schema.insert(
-        "PORT".to_string(),
-        SchemaField::Number {
-            required: true,
-            default: None,
-            description: None,
-        },
-    );
+    let schema_str = r#"{
+        "EMAIL": { "type": "string", "required": true, "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" },
+        "PORT": { "type": "number", "required": true }
+    }"#;
     
-    let mut env_vars = HashMap::new();
-    env_vars.insert("EMAIL".to_string(), "not-an-email".to_string());
-    env_vars.insert("PORT".to_string(), "not-a-number".to_string());
+    let env_str = "EMAIL=not-an-email\nPORT=not-a-number";
     
-    let result = validate_env(&env_vars, &schema, false);
+    let result = validate_env_with_schema(env_str, schema_str, false);
     assert!(!result.is_valid);
     assert_eq!(result.errors.len(), 2);
     
