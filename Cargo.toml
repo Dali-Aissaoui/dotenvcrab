@@ -1,6 +1,6 @@
 [package]
 name = "dotenvcrab"
-version = "0.1.7"
+version = "0.2.0"
 edition = "2024"
 description = "A blazing fast, portable CLI tool that validates .env files against JSON schema definitions with type checking, strict mode validation, and colorized error output"
 authors = ["dotenvcrab"]
